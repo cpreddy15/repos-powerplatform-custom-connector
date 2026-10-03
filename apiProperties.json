@@ -1,0 +1,18 @@
+{
+  "properties": {
+    "connectionParameters": {
+      "api_key": {
+        "type": "securestring",
+        "uiDefinition": {
+          "displayName": "API Key",
+          "description": "API key for the Finance Invoice API",
+          "tooltip": "Provide your API key",
+          "constraints": { "tabIndex": 2, "clearText": false, "required": "true" }
+        }
+      }
+    },
+    "iconBrandColor": "#742774",
+    "capabilities": [],
+    "publisher": "Pavan Reddy Cheedeti"
+  }
+}

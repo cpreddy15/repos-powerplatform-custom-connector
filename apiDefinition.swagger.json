@@ -1,0 +1,120 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Finance Invoice API",
+    "description": "Read and create invoices in the internal finance system.",
+    "version": "1.0"
+  },
+  "host": "api.example.com",
+  "basePath": "/finance/v1",
+  "schemes": ["https"],
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "securityDefinitions": {
+    "api_key": { "type": "apiKey", "in": "header", "name": "x-api-key" }
+  },
+  "security": [{ "api_key": [] }],
+  "paths": {
+    "/invoices": {
+      "get": {
+        "operationId": "GetInvoices",
+        "summary": "List invoices",
+        "description": "Returns invoices, optionally filtered by status.",
+        "parameters": [
+          {
+            "name": "status", "in": "query", "required": false, "type": "string",
+            "enum": ["Pending", "Approved", "Rejected", "Paid"],
+            "x-ms-summary": "Status", "description": "Filter by invoice status"
+          },
+          {
+            "name": "top", "in": "query", "required": false, "type": "integer", "default": 50,
+            "x-ms-summary": "Top", "description": "Maximum number of invoices to return"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "value": { "type": "array", "items": { "$ref": "#/definitions/Invoice" } }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "CreateInvoice",
+        "summary": "Create invoice",
+        "description": "Creates a new invoice.",
+        "parameters": [
+          { "name": "body", "in": "body", "required": true, "schema": { "$ref": "#/definitions/NewInvoice" } }
+        ],
+        "responses": {
+          "201": { "description": "Created", "schema": { "$ref": "#/definitions/Invoice" } }
+        }
+      }
+    },
+    "/invoices/{invoiceId}": {
+      "get": {
+        "operationId": "GetInvoiceById",
+        "summary": "Get invoice",
+        "description": "Returns a single invoice by ID.",
+        "parameters": [
+          { "name": "invoiceId", "in": "path", "required": true, "type": "string", "x-ms-summary": "Invoice ID" }
+        ],
+        "responses": {
+          "200": { "description": "OK", "schema": { "$ref": "#/definitions/Invoice" } },
+          "404": { "description": "Not found" }
+        }
+      }
+    },
+    "/invoices/{invoiceId}/status": {
+      "patch": {
+        "operationId": "UpdateInvoiceStatus",
+        "summary": "Update invoice status",
+        "description": "Approves or rejects an invoice.",
+        "parameters": [
+          { "name": "invoiceId", "in": "path", "required": true, "type": "string", "x-ms-summary": "Invoice ID" },
+          {
+            "name": "body", "in": "body", "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["status"],
+              "properties": {
+                "status": { "type": "string", "enum": ["Approved", "Rejected"], "x-ms-summary": "New status" },
+                "comment": { "type": "string", "x-ms-summary": "Comment" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "OK", "schema": { "$ref": "#/definitions/Invoice" } }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Invoice": {
+      "type": "object",
+      "properties": {
+        "invoiceId": { "type": "string", "x-ms-summary": "Invoice ID" },
+        "vendorName": { "type": "string", "x-ms-summary": "Vendor" },
+        "amount": { "type": "number", "format": "double", "x-ms-summary": "Amount" },
+        "currency": { "type": "string", "x-ms-summary": "Currency" },
+        "invoiceDate": { "type": "string", "format": "date", "x-ms-summary": "Invoice date" },
+        "status": { "type": "string", "x-ms-summary": "Status" }
+      }
+    },
+    "NewInvoice": {
+      "type": "object",
+      "required": ["vendorName", "amount", "currency", "invoiceDate"],
+      "properties": {
+        "vendorName": { "type": "string", "x-ms-summary": "Vendor" },
+        "amount": { "type": "number", "format": "double", "x-ms-summary": "Amount" },
+        "currency": { "type": "string", "x-ms-summary": "Currency" },
+        "invoiceDate": { "type": "string", "format": "date", "x-ms-summary": "Invoice date" }
+      }
+    }
+  }
+}
